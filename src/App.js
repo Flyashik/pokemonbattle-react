@@ -2,12 +2,10 @@
 import './App.css';
 import './api'
 import {fetchPokemonInfo} from "./api";
-import {useRef} from "react";
+import {useState} from "react";
 
 
 function App() {
-  const firstPokemon = useRef(null)
-  const secondPokemon = useRef(null)
   return (
     <div className="App">
         <Header/>
@@ -36,17 +34,36 @@ function Main() {
 
 function BattleForm() {
 
+    const [inputOne, setInputOne] = useState('');
+    const [inputTwo, setInputTwo] = useState('');
+
+    function getInfos() {
+        setInputOne(inputOne)
+        setInputTwo(inputTwo)
+    }
 
     return (
         <div className="Battle-form">
             <div className="inputs-container">
-                <input type="text" className="text-input" placeholder="Set name" required />
+                <input type="text" className="text-input"
+                       value={inputOne}
+                       onChange={(event) => setInputOne(event.target.value)}
+                       placeholder="Set name" required />
                 <p className="vs">VS</p>
-                <input type="text" className="text-input" placeholder="Set name" required />
+                <input type="text" className="text-input"
+                       value={inputTwo}
+                       onChange={(event) => setInputTwo(event.target.value)}
+                       placeholder="Set name" required />
             </div>
-            <button className="button-start">Let's start!</button>
+            <button className="button-start" onClick={getInfos}>Let's start!</button>
+            {[...Array(this.state.count)].map(() => <Input />)}
         </div>
+
     );
+}
+
+function PokemonCard(props) {
+    console.log(props.name)
 }
 
 function Footer(){
