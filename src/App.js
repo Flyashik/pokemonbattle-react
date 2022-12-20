@@ -56,7 +56,12 @@ function BattleForm() {
                        placeholder="Set name" required />
             </div>
             <button className="button-start" onClick={getInfos}>Let's start!</button>
-            {[...Array(this.state.count)].map(() => <Input />)}
+            {inputOne != '' && inputTwo != '' &&
+                <div>
+                    <PokemonCard name={inputOne}/>
+                    <PokemonCard name={inputTwo}/>
+                </div>
+            }
         </div>
 
     );
