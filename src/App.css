@@ -108,3 +108,15 @@
     font-size: 1.25rem;
   }
 }
+
+.results{
+  display: inline-flex;
+}
+
+li{
+  font-family: "Pokemon Solid", Verdana, Tahoma;
+  text-align: center;
+  font-size: 1rem;
+  color: rgb(17, 15, 22);
+  list-style-type: none; 
+}
