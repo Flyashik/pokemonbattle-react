@@ -1,8 +1,26 @@
-// import logo from '';
 import './App.css';
 import './api'
 import { fetchPokemonInfo } from "./api";
-import { useState, forwardRef, useRef, useImperativeHandle, useEffect } from "react";
+import { useState, useRef } from "react";
+import {
+    Chart as ChartJS,
+    RadialLinearScale,
+    PointElement,
+    LineElement,
+    Filler,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+import { Radar } from 'react-chartjs-2';
+
+ChartJS.register(
+    RadialLinearScale,
+    PointElement,
+    LineElement,
+    Filler,
+    Tooltip,
+    Legend
+);
 
 
 function App() {
@@ -34,22 +52,18 @@ function Main() {
 
 function BattleForm() {
 
-    const [inputOne, setInputOne] = useState('');
-    const [inputTwo, setInputTwo] = useState('');
+    const inputOne = useRef("");
+    const inputTwo = useRef("");
     const [info1, setInfo1] = useState({});
     const [info2, setInfo2] = useState({});
 
     function getInfos() {
-        setInputOne(inputOne)
-        setInputTwo(inputTwo)
-        let pokemonInfo = fetchPokemonInfo(inputOne.toLowerCase()).then((res) => {
-            // let fullInfo = res;
-            // fullInfo["name"] = inputOne;
+
+
+        let pokemonInfo = fetchPokemonInfo(inputOne.current.value.toLowerCase()).then((res) => {
             setInfo1(res);
         })
-        let pokemonInfo2 = fetchPokemonInfo(inputTwo.toLowerCase()).then((res) => {
-            // let fullInfo = res;
-            // fullInfo["name"] = inputTwo;
+        let pokemonInfo2 = fetchPokemonInfo(inputTwo.current.value.toLowerCase()).then((res) => {
             setInfo2(res);
         })
     }
@@ -58,52 +72,95 @@ function BattleForm() {
         <div className="Battle-form">
             <div className="inputs-container">
                 <input type="text" className="text-input"
-                    value={inputOne}
-                    onChange={(event) => setInputOne(event.target.value)}
+                    ref={inputOne}
                     placeholder="Set name" required />
                 <p className="vs">VS</p>
                 <input type="text" className="text-input"
-                    value={inputTwo}
-                    onChange={(event) => setInputTwo(event.target.value)}
+                    ref={inputTwo}
                     placeholder="Set name" required />
             </div>
             <button className="button-start" onClick={getInfos}>Let's start!</button>
-            <div className="results">
-                <PokemonCard info={info1} />
-                <PokemonCard info={info2} />
-                <Winner info={[info1, info2]} />
+            <div className="stats">
+                <PokemonCard info={[inputOne.current.value, info1]} />
+                <PokemonCard info={[inputTwo.current.value, info2]} />
+            </div>
+            <div className="result">
+                <Winner info={[info1, info2, inputOne.current.value, inputTwo.current.value]} />
             </div>
         </div>
 
     );
 }
 
-function Winner(info) {
-    console.log(info);
-    // let sumStats1 = 0;
-    // let sumStats2 = 0;
-    // for (const item in info1) {
-    //     sumStats1 += item
-    // }
-    // for (const item in info2) {
-    //     setSumStats2(pred => (pred + info2[item]));
-    // }
+function PokemonCard(info) {
+    if(!Object.keys(info.info[1]).length)
+        return (<></>);
+    let statsValuesArray = [];
+    let statsKeysArray = [];
+    for (const key in info.info[1]) {
+        statsValuesArray.push(info.info[1][key]);
+        statsKeysArray.push(key);
+    }
+    const results = [];
+    results.push(
+        <li key="name">name: {info.info[0]}</li>
+    );
+    for (const property in info.info[1]) {
+        results.push(
+            <li key={property}>{property}: {info.info[1][property]}</li>
+        );
+    }
 
-    // if (sumStats1 > sumStats2) {
-    //     return (
-    //         <p>Первый</p>
-    //     );
-    // }
-    // else if (sumStats1 == sumStats2) {
-    //     return (
-    //         <p>Draw!</p>
-    //     );
-    // }
-    // else {
-    //     return (
-    //         <p>Второй</p>
-    //     );
-    // }
+    const data = {
+        labels: statsKeysArray,
+        datasets: [
+            {
+                label: '# of Votes',
+                data: statsValuesArray,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    return (
+        <div>
+            <ul>
+                {results}
+            </ul>
+            <Radar data={data}/>
+        </div>
+    )
+}
+
+function Winner(info) {
+    let sumStats1 = 0;
+    let sumStats2 = 0;
+    if(!Object.keys(info.info[0]).length || !Object.keys(info.info[1]).length)
+        return (<></>);
+
+    for (const item in info.info[0]) {
+        sumStats1 += info.info[0][item];
+    }
+    for (const item in info.info[1]) {
+        sumStats2 += info.info[1][item];
+    }
+    if (sumStats1 > sumStats2) {
+        return (
+            <>{info.info[2]} win!</>
+        );
+    }
+    else if (sumStats1 === sumStats2) {
+        return (
+            <>Draw!</>
+        );
+    }
+    else {
+        return (
+            <>{info.info[3]} win!</>
+        );
+    }
 }
 
 function Footer() {
@@ -117,20 +174,4 @@ function Footer() {
     );
 }
 
-function PokemonCard({ info }) {
-    const results = [];
-    for (const property in info) {
-        results.push(
-            <li key={property}>{property}: {info[property]}</li>
-        );
-    }
-
-    return (
-        <div>
-            <ul>
-                {results}
-            </ul>
-        </div>
-    )
-}
 export default App;

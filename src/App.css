@@ -8,9 +8,12 @@
   src: url(fonts/PokemonHollow.ttf) format("truetype");
 }
 
+body{
+  background-color: rgb(255, 251, 176);
+}
+
 .App {
   text-align: center;
-  background-color: rgb(255, 251, 176);
 }
 
 .Header {
@@ -109,7 +112,7 @@
   }
 }
 
-.results{
+.stats{
   display: inline-flex;
 }
 
@@ -119,4 +122,10 @@ li{
   font-size: 1rem;
   color: rgb(17, 15, 22);
   list-style-type: none; 
+}
+
+.result{
+  font-family: "Pokemon Solid", Verdana, Tahoma;
+  text-align: center;
+  font-size: 1.2rem;
 }
